@@ -9,13 +9,17 @@ import (
 // When the dowhat is a success it will store a value of type T
 // when the dowhat is a failure it will store an error value.
 type DoWhat[T any] struct {
-	value   *T
+	value   T
 	error   error
 	success bool
 	failure bool
 }
 
-func (dowhat *DoWhat[T]) Value() *T {
+type MapperFunction[TInput any, TOutput any] func(input TInput) TOutput
+
+type EnsureFunction[TInput any] func(input TInput) bool
+
+func (dowhat *DoWhat[T]) Value() T {
 	return dowhat.value
 }
 
@@ -44,8 +48,8 @@ func New(text string) error {
 	return &errorString{text}
 }
 
-func Create[T any](value *T) DoWhat[T] {
-	if value != nil {
+func Create[T any](value T) DoWhat[T] {
+	if &value != nil {
 		return DoWhat[T]{
 			success: true,
 			failure: false,
@@ -54,12 +58,18 @@ func Create[T any](value *T) DoWhat[T] {
 	}
 	return DoWhat[T]{
 		success: false,
-		failure: false,
-		error:   errors.New("The value of the defined type is nil"),
-		value:   nil}
+		failure: true,
+		error:   errors.New("The value of the defined type is nil")}
 }
 
-// func (dowhat *DoWhat[T]) Map(mapping func(input T) T) DoWhat[T] {
+func Failure[T any](error error) DoWhat[T] {
+	return DoWhat[T]{
+		success: false,
+		failure: true,
+		error:   error}
+}
+
+// func (dowhat *DoWhat[T]) Map(mapper Mapper[T, TOutput]) DoWhat[TOutput] {
 // 	if dowhat.success {
 // 		var value T = mapping(dowhat.value)
 // 	}
@@ -67,15 +77,37 @@ func Create[T any](value *T) DoWhat[T] {
 // 	return DoWhat[T]{value: mapping(dowhat.value)}
 // }
 
+func (dowhat *DoWhat[T]) Ensure(ensure EnsureFunction[T]) DoWhat[T] {
+	if dowhat.success {
+
+		if ensure(dowhat.value) {
+			return *dowhat
+		}
+		return Failure[T](errors.New("Failed to ensure the value was valid"))
+	}
+	return Failure[T](errors.New("Failed to ensure the value was valid"))
+}
+
 func main() {
 	fmt.Println("hello world")
-
-	var str string = "122fefe"
-	dowhat := Create[string](&str)
+	dowhat := Create[string]("hello")
 
 	fmt.Println(dowhat.IsSuccessfull())
 	fmt.Println(dowhat.error)
 	fmt.Println(dowhat.value)
 	fmt.Println(dowhat.Value())
 
+	dowhat.Ensure(func(input string) bool {
+		fmt.Println("Ensuring the data is valid")
+		return input == "hello"
+	})
+
+	fmt.Println(dowhat.success)
+
+	dowhat.Ensure(func(input string) bool {
+		fmt.Printf("Ensuring the data is valid %s \n", input)
+		return false
+	})
+
+	fmt.Println(dowhat.IsSuccessfull())
 }
