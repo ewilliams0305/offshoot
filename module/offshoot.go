@@ -92,7 +92,9 @@ func (offshoot *Offshoot[T]) fail(e error) *Offshoot[T] {
 // 	return Create(offshoot.value)
 // }
 
-func MapperT[TInput any, TOutput any](offshoot *Offshoot[TInput], mapper MapperFunction[TInput, TOutput]) Offshoot[TOutput] {
+
+
+func Mapper[TInput any, TOutput any](offshoot *Offshoot[TInput], mapper MapperFunction[TInput, TOutput]) Offshoot[TOutput] {
 
 	if offshoot.success {
 		return Create(mapper(offshoot.value))
@@ -111,4 +113,12 @@ func (offshoot *Offshoot[T]) Ensure(ensure EnsureFunction[T]) *Offshoot[T] {
 		return offshoot.fail(errors.New("Failed to ensure the value matches the predicate"))
 	}
 	return offshoot
+}
+
+func (offshoot *Offshoot[T]) Or(value ValueHandle[T], error ErrorHandle) Offshoot[T] {
+  if(offshoot.success){
+   return value(value)
+  }
+
+  return error(offshoot.error)
 }
