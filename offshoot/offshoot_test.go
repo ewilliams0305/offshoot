@@ -62,14 +62,13 @@ func TestEnsure_DoesNotValidate_WhenOffshootIsFailure(t *testing.T) {
 	// ACT
 	off := offshoot.
 		Ensure(func(input int) bool {
-			return input == 10
+			return input == 12
 		}).
 		Ensure(func(input int) bool {
-			//t.Errorf("The second ensure function was execued dispite being a failure")
 			return true
 		})
 
-	result := MapperT[int, string](off, func(input int) string {
+	result := MapOffshoot[int, string](off, func(input int) string {
 		return strconv.Itoa(input)
 	})
 

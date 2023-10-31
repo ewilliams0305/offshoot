@@ -5,10 +5,6 @@ An offshoot instance can only ever be a failure or a success and can never store
 */
 package offshoot
 
-import (
-	"errors"
-)
-
 // The offshoot type can only ever be a success or a result.
 // When the offshoot is a success it will store a value of type T
 // when the offshoot is a failure it will store an error value.
@@ -56,20 +52,4 @@ func Failure[T any](error error) Offshoot[T] {
 		success: false,
 		failure: true,
 		error:   error}
-}
-
-func (offshoot *Offshoot[T]) fail(e error) *Offshoot[T] {
-	offshoot.error = e
-	offshoot.failure = true
-	offshoot.success = false
-	return offshoot
-}
-
-func Mapper[TInput any, TOutput any](offshoot *Offshoot[TInput], mapper MapperFunction[TInput, TOutput]) Offshoot[TOutput] {
-
-	if offshoot.success {
-		return Create(mapper(offshoot.value))
-	}
-
-	return Failure[TOutput](errors.New("Failed to map values, the offshoot was already in a failed state"))
 }

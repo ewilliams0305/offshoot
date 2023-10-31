@@ -22,7 +22,7 @@ jobs:
         go-version: '1.20'
 
     - name: Build
-      run: go build -v ./module/functions.go ./module/offshoot.go
+      run: go build -v ./offshoot/functions.go ./offshoot/offshoot.go offshoot.go ./offshoot/types.go ./offshoot/functions.go ./offshoot/receivers.go
 
     - name: Test
-      run: go test -v ./module/offshoot.go
+      run: go test -v ./offshoot/offshoot.go
