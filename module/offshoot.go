@@ -35,38 +35,20 @@ func (offshoot *Offshoot[T]) IsFailure() bool {
 	return offshoot.failure
 }
 
-// // errorString is a trivial implementation of error.
-// type errorString struct {
-// 	s string
-// }
-
-// func (e *errorString) Error() string {
-// 	return e.s
-// }
-
-// func New(text string) error {
-// 	return &errorString{text}
-// }
-
-func New[T any](value T, error Error) Offshoot[T] {
-	if error == nil {
+func New[T any](value T, err error) Offshoot[T] {
+	if err == nil {
 		return Create(value)
 	}
-	return Failure(error)
+	return Failure[T](err)
 }
 
 func Create[T any](value T) Offshoot[T] {
-	if &value != nil {
-		return Offshoot[T]{
-			success: true,
-			failure: false,
-			error:   nil,
-			value:   value}
-	}
+
 	return Offshoot[T]{
-		success: false,
-		failure: true,
-		error:   errors.New("The value of the defined type is nil")}
+		success: true,
+		failure: false,
+		error:   nil,
+		value:   value}
 }
 
 func Failure[T any](error error) Offshoot[T] {
@@ -83,17 +65,6 @@ func (offshoot *Offshoot[T]) fail(e error) *Offshoot[T] {
 	return offshoot
 }
 
-// func (offshoot *Offshoot[TInput]) Mapper(mapper MapperFunction[TInput, TOutput]) Offshoot[TOutput] {
-
-// 	if offshoot.success {
-// 		return Create(mapper(offshoot.value))
-// 	}
-
-// 	return Create(offshoot.value)
-// }
-
-
-
 func Mapper[TInput any, TOutput any](offshoot *Offshoot[TInput], mapper MapperFunction[TInput, TOutput]) Offshoot[TOutput] {
 
 	if offshoot.success {
@@ -101,24 +72,4 @@ func Mapper[TInput any, TOutput any](offshoot *Offshoot[TInput], mapper MapperFu
 	}
 
 	return Failure[TOutput](errors.New("Failed to map values, the offshoot was already in a failed state"))
-}
-
-func (offshoot *Offshoot[T]) Ensure(ensure EnsureFunction[T]) *Offshoot[T] {
-
-	if offshoot.success {
-
-		if ensure(offshoot.value) {
-			return offshoot
-		}
-		return offshoot.fail(errors.New("Failed to ensure the value matches the predicate"))
-	}
-	return offshoot
-}
-
-func (offshoot *Offshoot[T]) Or(value ValueHandle[T], error ErrorHandle) Offshoot[T] {
-  if(offshoot.success){
-   return value(value)
-  }
-
-  return error(offshoot.error)
 }
