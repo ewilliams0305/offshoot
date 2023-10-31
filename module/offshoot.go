@@ -49,7 +49,7 @@ func (offshoot *Offshoot[T]) IsFailure() bool {
 // }
 
 func New[T any](value T, error Error) Offshoot[T] {
-	if error = nil {
+	if error == nil {
 		return Create(value)
 	}
 	return Failure(error)
