@@ -25,4 +25,4 @@ jobs:
       run: go build -v ./offshoot/offshoot.go ./offshoot/functions.go ./offshoot/types.go ./offshoot/receivers.go
 
     - name: Test
-      run: go test -v ./offshoot/
+      run: go test -v .\offshoot\
