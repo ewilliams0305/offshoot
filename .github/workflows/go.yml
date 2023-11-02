@@ -19,10 +19,10 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.20'
 
     - name: Build
-      run: go build -v ./pkg/offshoot.go ./pkg/functions.go ./pkg/types.go ./pkg/receivers.go
-
+      run: go build -v ./pkg
+      
     - name: Test
-      run: go test -v .\pkg\
+      run: go test -v ./pkg
