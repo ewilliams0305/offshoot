@@ -68,6 +68,10 @@ func (offshoot *Offshoot[T]) Or(value ValueHandle[T], error ErrorHandle[T]) Offs
 	return error(offshoot.error)
 }
 
+// func (o *Offshoot[T]) toString() string {
+// 	return fmt.Sprintf("RESULT: %+v ", o)
+// }
+
 // Mutates an existing offshoot with the error provided.
 func (offshoot *Offshoot[T]) fail(e error) *Offshoot[T] {
 	offshoot.error = e
